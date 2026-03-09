@@ -40,7 +40,7 @@ class Database
         'port' => 3306,
         'dbname' => 'personal_notes',
         'username' => 'root',
-        'password' => '',
+        'password' => 'Telza#45Max',
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
         'options' => [

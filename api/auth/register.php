@@ -74,7 +74,6 @@ declare(strict_types=1);
  */
 
 use PersonalNotes\Database;
-use PDO;
 
 // Set content type
 header('Content-Type: application/json');
