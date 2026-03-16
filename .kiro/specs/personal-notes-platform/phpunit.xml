@@ -25,7 +25,7 @@
 
     <source>
         <include>
-            <directory>api</directory>
+            <directory>../../../api</directory>
         </include>
     </source>
 </phpunit>

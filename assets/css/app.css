@@ -1,0 +1,29 @@
+body { background: #f8f9fa; }
+
+.note-card {
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.note-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+
+.note-card .card-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-card .card-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: .875rem;
+  color: #555;
+}
+
+.tag-badge {
+  font-size: .75rem;
+  margin-right: .25rem;
+}
+
+#auth-section { margin-top: 80px; }

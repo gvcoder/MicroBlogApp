@@ -334,4 +334,128 @@ class Database
     {
         return $pdo->inTransaction();
     }
+
+    /**
+     * Validate session token and get user ID
+     * 
+     * @param string $token Session token
+     * @return int|null User ID if valid session, null otherwise
+     * @throws Exception If database query fails
+     */
+    public static function validateSession(string $token): ?int
+    {
+        try {
+            $pdo = self::getConnection();
+            
+            // Check if token exists and is not expired
+            $stmt = $pdo->prepare(
+                'SELECT user_id FROM sessions WHERE token = ? AND expires_at > NOW()'
+            );
+            $stmt->execute([$token]);
+            
+            $result = $stmt->fetch();
+            
+            if ($result) {
+                return (int)$result['user_id'];
+            }
+            
+            return null;
+        } catch (PDOException $e) {
+            throw new Exception(
+                "Session validation failed: " . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * Delete session by token
+     * 
+     * @param string $token Session token to delete
+     * @return bool True if session was deleted, false if not found
+     * @throws Exception If database query fails
+     */
+    public static function deleteSession(string $token): bool
+    {
+        try {
+            $pdo = self::getConnection();
+            
+            $stmt = $pdo->prepare('DELETE FROM sessions WHERE token = ?');
+            $stmt->execute([$token]);
+            
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            throw new Exception(
+                "Session deletion failed: " . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * Get user ID from session token
+     * 
+     * @param string $token Session token
+     * @return int|null User ID if valid session, null otherwise
+     * @throws Exception If database query fails
+     */
+    public static function getUserIdFromToken(string $token): ?int
+    {
+        return self::validateSession($token);
+    }
+
+    /**
+     * Create a new session
+     * 
+     * @param int $userId User ID
+     * @param string $token Session token
+     * @param string $expiresAt Expiration datetime (Y-m-d H:i:s format)
+     * @return bool True if session created successfully
+     * @throws Exception If database query fails
+     */
+    public static function createSession(int $userId, string $token, string $expiresAt): bool
+    {
+        try {
+            $pdo = self::getConnection();
+            
+            $stmt = $pdo->prepare(
+                'INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)'
+            );
+            $stmt->execute([$userId, $token, $expiresAt]);
+            
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            throw new Exception(
+                "Session creation failed: " . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * Clean up expired sessions
+     * 
+     * @return int Number of sessions deleted
+     * @throws Exception If database query fails
+     */
+    public static function cleanupExpiredSessions(): int
+    {
+        try {
+            $pdo = self::getConnection();
+            
+            $stmt = $pdo->prepare('DELETE FROM sessions WHERE expires_at <= NOW()');
+            $stmt->execute();
+            
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            throw new Exception(
+                "Session cleanup failed: " . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
 }
