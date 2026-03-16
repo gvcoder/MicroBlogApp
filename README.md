@@ -1,2 +1,2 @@
 # mydemorep
-gvmuthu demo repository
+Micro Blog Application
